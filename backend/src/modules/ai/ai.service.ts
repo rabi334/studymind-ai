@@ -1,16 +1,18 @@
-import Groq from 'groq-sdk';
-import dotenv from 'dotenv';
+import Groq from "groq-sdk";
+import dotenv from "dotenv";
+import fs from "fs";
 
+import PDFParser from "pdf2json";
 dotenv.config();
 
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 interface Course {
   name: string;
   exam_date: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: "easy" | "medium" | "hard";
 }
 
 interface StudyTask {
@@ -23,17 +25,18 @@ interface StudyTask {
 export const generateStudyPlan = async (
   courses: Course[],
   studentName: string,
-  completedTopics: string[] = []
+  completedTopics: string[] = [],
 ): Promise<StudyTask[]> => {
   const now = new Date();
-const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-const tomorrowDate = new Date(now);
-tomorrowDate.setDate(now.getDate() + 1);
-const tomorrow = `${tomorrowDate.getFullYear()}-${String(tomorrowDate.getMonth() + 1).padStart(2, '0')}-${String(tomorrowDate.getDate()).padStart(2, '0')}`;
-  
-  const completedSection = completedTopics.length > 0
-    ? `\nAlready completed topics (DO NOT repeat these):\n${completedTopics.map(t => `- ${t}`).join('\n')}`
-    : '';
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const tomorrowDate = new Date(now);
+  tomorrowDate.setDate(now.getDate() + 1);
+  const tomorrow = `${tomorrowDate.getFullYear()}-${String(tomorrowDate.getMonth() + 1).padStart(2, "0")}-${String(tomorrowDate.getDate()).padStart(2, "0")}`;
+
+  const completedSection =
+    completedTopics.length > 0
+      ? `\nAlready completed topics (DO NOT repeat these):\n${completedTopics.map((t) => `- ${t}`).join("\n")}`
+      : "";
   const prompt = `
 You are an expert academic study planner.
 
@@ -46,8 +49,8 @@ CRITICAL DATE RULES:
 - Double check every single date in your response is >= ${today}
 
 Their courses and exam dates:
-${courses.map(c => `- ${c.name} | Exam: ${c.exam_date} | Difficulty: ${c.difficulty}`).join('\n')}
-${completedSection ?? ''}
+${courses.map((c) => `- ${c.name} | Exam: ${c.exam_date} | Difficulty: ${c.difficulty}`).join("\n")}
+${completedSection ?? ""}
 
 Rules:
 - Distribute study sessions smartly based on exam dates and difficulty
@@ -70,15 +73,15 @@ Respond ONLY with a valid JSON array, no markdown, no explanation, just raw JSON
 `;
 
   const response = await groq.chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
-    messages: [{ role: 'user', content: prompt }],
-    temperature: 0.7
+    model: "llama-3.3-70b-versatile",
+    messages: [{ role: "user", content: prompt }],
+    temperature: 0.7,
   });
 
-  const text = response.choices[0]?.message?.content || '';
-  console.log('Raw response:', text);
+  const text = response.choices[0]?.message?.content || "";
+  console.log("Raw response:", text);
 
-  const cleaned = text.replace(/```json|```/g, '').trim();
+  const cleaned = text.replace(/```json|```/g, "").trim();
   const tasks: StudyTask[] = JSON.parse(cleaned);
 
   return tasks;
@@ -86,17 +89,18 @@ Respond ONLY with a valid JSON array, no markdown, no explanation, just raw JSON
 export const generateStudyPlanWithContext = async (
   courses: Course[],
   studentName: string,
-  completedTopics: string[] = []
+  completedTopics: string[] = [],
 ): Promise<StudyTask[]> => {
-const now = new Date();
-const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-const tomorrowDate = new Date(now);
-tomorrowDate.setDate(now.getDate() + 1);
-  const tomorrow = `${tomorrowDate.getFullYear()}-${String(tomorrowDate.getMonth() + 1).padStart(2, '0')}-${String(tomorrowDate.getDate()).padStart(2, '0')}`;
-  
-  const completedSection = completedTopics.length > 0
-    ? `\nAlready completed topics (DO NOT repeat these):\n${completedTopics.map(t => `- ${t}`).join('\n')}`
-    : '';
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const tomorrowDate = new Date(now);
+  tomorrowDate.setDate(now.getDate() + 1);
+  const tomorrow = `${tomorrowDate.getFullYear()}-${String(tomorrowDate.getMonth() + 1).padStart(2, "0")}-${String(tomorrowDate.getDate()).padStart(2, "0")}`;
+
+  const completedSection =
+    completedTopics.length > 0
+      ? `\nAlready completed topics (DO NOT repeat these):\n${completedTopics.map((t) => `- ${t}`).join("\n")}`
+      : "";
 
   const prompt = `
 You are an expert academic study planner.
@@ -110,7 +114,7 @@ CRITICAL DATE RULES:
 - Double check every single date in your response is >= ${today}
 
 Their courses and exam dates:
-${courses.map(c => `- ${c.name} | Exam: ${c.exam_date} | Difficulty: ${c.difficulty}`).join('\n')}
+${courses.map((c) => `- ${c.name} | Exam: ${c.exam_date} | Difficulty: ${c.difficulty}`).join("\n")}
 ${completedSection}
 
 Rules:
@@ -136,13 +140,13 @@ Respond ONLY with a valid JSON array, no markdown, no explanation, just raw JSON
 `;
 
   const response = await groq.chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
-    messages: [{ role: 'user', content: prompt }],
-    temperature: 0.7
+    model: "llama-3.3-70b-versatile",
+    messages: [{ role: "user", content: prompt }],
+    temperature: 0.7,
   });
 
-  const text = response.choices[0]?.message?.content || '';
-  const cleaned = text.replace(/```json|```/g, '').trim();
+  const text = response.choices[0]?.message?.content || "";
+  const cleaned = text.replace(/```json|```/g, "").trim();
   const tasks: StudyTask[] = JSON.parse(cleaned);
 
   return tasks;
@@ -150,7 +154,7 @@ Respond ONLY with a valid JSON array, no markdown, no explanation, just raw JSON
 
 export const generateTopicNotes = async (
   topic: string,
-  courseName: string
+  courseName: string,
 ): Promise<string> => {
   const prompt = `
 You are an expert university tutor.
@@ -169,10 +173,89 @@ Format nicely but keep it concise. Use plain text, no markdown headers.
 `;
 
   const response = await groq.chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
-    messages: [{ role: 'user', content: prompt }],
-    temperature: 0.7
+    model: "llama-3.3-70b-versatile",
+    messages: [{ role: "user", content: prompt }],
+    temperature: 0.7,
   });
 
-  return response.choices[0]?.message?.content || 'No notes generated';
+  return response.choices[0]?.message?.content || "No notes generated";
+};
+
+//upload and parse PDF notes
+export const extractPdfText = async (filePath: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const pdfParser = new (PDFParser as any)(null, 1);
+
+    pdfParser.on("pdfParser_dataError", (err: any) => {
+      reject(err.parserError);
+    });
+
+    pdfParser.on("pdfParser_dataReady", () => {
+      const text = pdfParser.getRawTextContent();
+      resolve(text.slice(0, 3000));
+    });
+
+    pdfParser.loadPDF(filePath);
+  });
+};
+
+export const generateStudyPlanFromPDF = async (
+  courses: Course[],
+  studentName: string,
+  pdfContent: string,
+): Promise<StudyTask[]> => {
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const tomorrowDate = new Date(now);
+  tomorrowDate.setDate(now.getDate() + 1);
+  const tomorrow = `${tomorrowDate.getFullYear()}-${String(tomorrowDate.getMonth() + 1).padStart(2, "0")}-${String(tomorrowDate.getDate()).padStart(2, "0")}`;
+
+  const prompt = `
+You are an expert academic study planner.
+
+Create a personalized day-by-day study plan for a student named ${studentName}.
+
+CRITICAL DATE RULES:
+- TODAY is exactly: ${today}
+- Start ALL tasks from: ${tomorrow} or later
+- NEVER generate any task with a date before ${today}
+
+Their courses and exam dates:
+${courses.map((c) => `- ${c.name} | Exam: ${c.exam_date} | Difficulty: ${c.difficulty}`).join("\n")}
+
+Course content from their uploaded syllabus/notes:
+---
+${pdfContent}
+---
+
+Rules:
+- Use the actual topics from the course content above
+- Distribute study sessions based on exam dates and difficulty
+- Harder courses get more time
+- Don't schedule tasks after an exam date
+- Each session should be 30-90 minutes
+- Max 3 study sessions per day
+- Be very specific about topics based on the PDF content
+
+Respond ONLY with a valid JSON array, no markdown, no explanation:
+[
+  {
+    "day_date": "${tomorrow}",
+    "topic": "specific topic from the PDF",
+    "course_name": "Course Name",
+    "duration_minutes": 60
+  }
+]
+`;
+
+  const response = await groq.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [{ role: "user", content: prompt }],
+    temperature: 0.7,
+  });
+
+  const text = response.choices[0]?.message?.content || "";
+  const cleaned = text.replace(/```json|```/g, "").trim();
+  const tasks: StudyTask[] = JSON.parse(cleaned);
+  return tasks;
 };

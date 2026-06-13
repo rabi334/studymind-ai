@@ -28,3 +28,17 @@ export const deleteCourse = async (courseId: number, userId: number) => {
   );
   return result.rows[0];
 };
+
+export const addCourseWithPDF = async (
+  userId: number,
+  name: string,
+  exam_date: string,
+  difficulty: 'easy' | 'medium' | 'hard',
+  pdfContent?: string
+) => {
+  const result = await pool.query(
+    'INSERT INTO courses (user_id, name, exam_date, difficulty, pdf_content) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+    [userId, name, exam_date, difficulty, pdfContent || null]
+  );
+  return result.rows[0];
+};

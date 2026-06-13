@@ -1,17 +1,47 @@
-import { Response } from 'express';
-import { AuthRequest } from '../../middleware/auth';
-import { addCourse, getUserCourses, deleteCourse } from './courses.service';
+import { Response } from "express";
+import { AuthRequest } from "../../middleware/auth";
+import {
+  addCourse,
+  getUserCourses,
+  deleteCourse,
+  addCourseWithPDF,
+} from "./courses.service";
+import { extractPdfText } from "../ai/ai.service";
+import fs from "fs";
 
 export const createCourse = async (req: AuthRequest, res: Response) => {
   try {
+    console.log("📁 File received:", req.file);
+    console.log("📦 Body received:", req.body);
     const { name, exam_date, difficulty } = req.body;
     const userId = Number(req.user!.userId);
 
     if (!name || !exam_date) {
-      return res.status(400).json({ error: 'name and exam_date are required' });
+      return res.status(400).json({ error: "name and exam_date are required" });
     }
 
-    const course = await addCourse(userId, name, exam_date, difficulty || 'medium');
+    let pdfContent: string | undefined;
+
+    // If PDF was uploaded extract its text
+    if (req.file) {
+      try {
+        pdfContent = await extractPdfText(req.file.path);
+        // Delete file after extracting text
+        fs.unlinkSync(req.file.path);
+      } catch (err) {
+        console.error("PDF parse error:", err);
+      }
+    }
+
+    const course = await addCourseWithPDF(
+      userId,
+      name,
+      exam_date,
+      difficulty || "medium",
+      pdfContent,
+    );
+
+    // const course = await addCourse(userId, name, exam_date, difficulty || 'medium');
     res.status(201).json({ success: true, course });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -35,10 +65,10 @@ export const removeCourse = async (req: AuthRequest, res: Response) => {
 
     const deleted = await deleteCourse(courseId, userId);
     if (!deleted) {
-      return res.status(404).json({ error: 'Course not found' });
+      return res.status(404).json({ error: "Course not found" });
     }
 
-    res.json({ success: true, message: 'Course deleted' });
+    res.json({ success: true, message: "Course deleted" });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
