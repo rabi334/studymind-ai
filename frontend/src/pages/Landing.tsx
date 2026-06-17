@@ -5,31 +5,109 @@ const Landing = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
+  const features = [
+    {
+      icon: "📄",
+      title: "Upload Your Syllabus",
+      desc: "Upload your course PDF and AI reads the actual content to build a relevant study plan.",
+    },
+    {
+      icon: "🗓️",
+      title: "Personalized Daily Plan",
+      desc: "Get a smart day-by-day schedule based on your exam dates and course difficulty.",
+    },
+    {
+      icon: "📝",
+      title: "AI Study Notes",
+      desc: "Click any topic to instantly get AI-generated study notes and key concepts.",
+    },
+    {
+      icon: "✅",
+      title: "Track Your Progress",
+      desc: "Mark tasks complete and watch your progress bar grow toward exam day.",
+    },
+    {
+      icon: "🔄",
+      title: "Adaptive Replanning",
+      desc: "Missed a day? Regenerate your plan and AI adjusts while remembering what you covered.",
+    },
+    {
+      icon: "🎯",
+      title: "Multi-Course Support",
+      desc: "Manage multiple courses with smart prioritization based on exam proximity.",
+    },
+  ];
+
+  const steps = [
+    { step: "1", title: "Create Account", desc: "Sign up for free in seconds" },
+    {
+      step: "2",
+      title: "Add Courses",
+      desc: "Enter your courses and exam dates",
+    },
+    {
+      step: "3",
+      title: "Upload Syllabus",
+      desc: "Optionally upload your PDF notes",
+    },
+    {
+      step: "4",
+      title: "Get Your Plan",
+      desc: "AI generates your study schedule",
+    },
+  ];
+
+  const btnPrimary = {
+    background: "#00F0FF",
+    color: "#0B132B",
+    border: "none",
+    borderRadius: "8px",
+    padding: "12px 28px",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+  } as React.CSSProperties;
+
+  const btnSecondary = {
+    background: "transparent",
+    color: "#00F0FF",
+    border: "0.5px solid #00F0FF",
+    borderRadius: "8px",
+    padding: "12px 28px",
+    fontSize: "14px",
+    fontWeight: 500,
+    cursor: "pointer",
+  } as React.CSSProperties;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div
+      style={{ minHeight: "100vh", background: "#121212", color: "#FFFFFF" }}
+    >
       {/* Navbar */}
-      <nav className="flex justify-between items-center px-8 py-5 bg-white shadow-sm">
-        <h1 className="text-2xl font-bold text-blue-600">StudyMind AI 🧠</h1>
-        <div className="flex gap-3">
+      <nav
+        style={{
+          background: "#0B132B",
+          borderBottom: "0.5px solid #1E2A3A",
+          padding: "14px 32px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <span style={{ color: "#00F0FF", fontSize: "18px", fontWeight: 500 }}>
+          StudyMind AI
+        </span>
+        <div style={{ display: "flex", gap: "10px" }}>
           {isAuthenticated ? (
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition font-medium"
-            >
-              Go to Dashboard
+            <button onClick={() => navigate("/dashboard")} style={btnPrimary}>
+              Dashboard
             </button>
           ) : (
             <>
-              <button
-                onClick={() => navigate("/login")}
-                className="text-blue-600 border border-blue-600 px-5 py-2 rounded-lg hover:bg-blue-50 transition font-medium"
-              >
+              <button onClick={() => navigate("/login")} style={btnSecondary}>
                 Login
               </button>
-              <button
-                onClick={() => navigate("/register")}
-                className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition font-medium"
-              >
+              <button onClick={() => navigate("/register")} style={btnPrimary}>
                 Get Started
               </button>
             </>
@@ -37,84 +115,126 @@ const Landing = () => {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <div className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <div className="inline-block bg-blue-100 text-blue-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-          ✨ AI-Powered Study Planning
+      {/* Hero */}
+      <div
+        style={{
+          maxWidth: "800px",
+          margin: "0 auto",
+          padding: "80px 24px 60px",
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            display: "inline-block",
+            background: "#0B132B",
+            border: "0.5px solid #1E2A3A",
+            borderRadius: "100px",
+            padding: "6px 16px",
+            fontSize: "12px",
+            color: "#00F0FF",
+            marginBottom: "24px",
+            letterSpacing: "0.05em",
+          }}
+        >
+          AI-Powered Study Planning
         </div>
-        <h1 className="text-5xl font-extrabold text-gray-800 leading-tight mb-6">
-          Study Smarter,
-          <br />
-          <span className="text-blue-600">Not Harder</span>
+        <h1
+          style={{
+            fontSize: "42px",
+            fontWeight: 500,
+            lineHeight: 1.2,
+            marginBottom: "20px",
+            color: "#FFFFFF",
+          }}
+        >
+          Study Smarter, <span style={{ color: "#00F0FF" }}>Not Harder</span>
         </h1>
-        <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto">
+        <p
+          style={{
+            fontSize: "16px",
+            color: "#8D99AE",
+            lineHeight: 1.7,
+            marginBottom: "36px",
+            maxWidth: "560px",
+            margin: "0 auto 36px",
+          }}
+        >
           Upload your syllabus, add your exam dates, and let AI build you a
           personalized day-by-day study plan — completely free.
         </p>
-        <div className="flex gap-4 justify-center">
+        <div
+          style={{
+            display: "flex",
+            gap: "12px",
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
           <button
             onClick={() => navigate("/register")}
-            className="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-blue-700 transition shadow-lg"
+            style={{ ...btnPrimary, padding: "14px 32px", fontSize: "15px" }}
           >
             Start for Free →
           </button>
           <button
             onClick={() => navigate("/login")}
-            className="bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-bold hover:bg-blue-50 transition shadow border border-blue-100"
+            style={{ ...btnSecondary, padding: "14px 32px", fontSize: "15px" }}
           >
             Login
           </button>
         </div>
       </div>
 
-      {/* Features Section */}
-      <div className="max-w-5xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
+      {/* Features */}
+      <div
+        style={{ maxWidth: "900px", margin: "0 auto", padding: "60px 24px" }}
+      >
+        <h2
+          style={{
+            fontSize: "22px",
+            fontWeight: 500,
+            textAlign: "center",
+            color: "#FFFFFF",
+            marginBottom: "40px",
+          }}
+        >
           Everything you need to ace your exams
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              icon: "📄",
-              title: "Upload Your Syllabus",
-              desc: "Upload your course PDF and AI reads the actual content to build a relevant study plan.",
-            },
-            {
-              icon: "🗓️",
-              title: "Personalized Daily Plan",
-              desc: "Get a smart day-by-day schedule based on your exam dates and course difficulty.",
-            },
-            {
-              icon: "📝",
-              title: "AI Study Notes",
-              desc: "Click any topic to instantly get AI-generated study notes and key concepts.",
-            },
-            {
-              icon: "✅",
-              title: "Track Your Progress",
-              desc: "Mark tasks complete and watch your progress bar grow toward exam day.",
-            },
-            {
-              icon: "🔄",
-              title: "Adaptive Replanning",
-              desc: "Missed a day? Regenerate your plan and AI adjusts while remembering what you covered.",
-            },
-            {
-              icon: "🎯",
-              title: "Multi-Course Support",
-              desc: "Manage multiple courses at once with smart prioritization based on exam proximity.",
-            },
-          ].map((feature, i) => (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: "16px",
+          }}
+        >
+          {features.map((f, i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition"
+              style={{
+                background: "#0B132B",
+                border: "0.5px solid #1E2A3A",
+                borderRadius: "14px",
+                padding: "24px",
+              }}
             >
-              <div className="text-4xl mb-4">{feature.icon}</div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                {feature.title}
+              <div style={{ fontSize: "28px", marginBottom: "12px" }}>
+                {f.icon}
+              </div>
+              <h3
+                style={{
+                  fontSize: "15px",
+                  fontWeight: 500,
+                  color: "#FFFFFF",
+                  marginBottom: "8px",
+                }}
+              >
+                {f.title}
               </h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                {feature.desc}
+              <p
+                style={{ fontSize: "13px", color: "#8D99AE", lineHeight: 1.7 }}
+              >
+                {f.desc}
               </p>
             </div>
           ))}
@@ -122,67 +242,120 @@ const Landing = () => {
       </div>
 
       {/* How it works */}
-      <div className="bg-white py-16">
-        <div className="max-w-4xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
+      <div
+        style={{
+          background: "#0B132B",
+          borderTop: "0.5px solid #1E2A3A",
+          borderBottom: "0.5px solid #1E2A3A",
+          padding: "60px 24px",
+        }}
+      >
+        <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+          <h2
+            style={{
+              fontSize: "22px",
+              fontWeight: 500,
+              textAlign: "center",
+              color: "#FFFFFF",
+              marginBottom: "40px",
+            }}
+          >
             How it works
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
-            {[
-              {
-                step: "1",
-                title: "Create Account",
-                desc: "Sign up for free in seconds",
-              },
-              {
-                step: "2",
-                title: "Add Courses",
-                desc: "Enter your courses and exam dates",
-              },
-              {
-                step: "3",
-                title: "Upload Syllabus",
-                desc: "Optionally upload your PDF notes",
-              },
-              {
-                step: "4",
-                title: "Get Your Plan",
-                desc: "AI generates your study schedule",
-              },
-            ].map((item, i) => (
-              <div key={i} className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4">
-                  {item.step}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+              gap: "24px",
+              textAlign: "center",
+            }}
+          >
+            {steps.map((s, i) => (
+              <div key={i}>
+                <div
+                  style={{
+                    width: "44px",
+                    height: "44px",
+                    background: "#00F0FF",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "0 auto 14px",
+                    fontSize: "16px",
+                    fontWeight: 500,
+                    color: "#0B132B",
+                  }}
+                >
+                  {s.step}
                 </div>
-                <h3 className="font-bold text-gray-800 mb-1">{item.title}</h3>
-                <p className="text-gray-500 text-sm">{item.desc}</p>
+                <h3
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: 500,
+                    color: "#FFFFFF",
+                    marginBottom: "6px",
+                  }}
+                >
+                  {s.title}
+                </h3>
+                <p style={{ fontSize: "12px", color: "#8D99AE" }}>{s.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* CTA Section */}
-      <div className="max-w-3xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-4xl font-extrabold text-gray-800 mb-4">
+      {/* CTA */}
+      <div
+        style={{
+          maxWidth: "600px",
+          margin: "0 auto",
+          padding: "80px 24px",
+          textAlign: "center",
+        }}
+      >
+        <h2
+          style={{
+            fontSize: "28px",
+            fontWeight: 500,
+            color: "#FFFFFF",
+            marginBottom: "12px",
+          }}
+        >
           Ready to study smarter?
         </h2>
-        <p className="text-gray-500 mb-8 text-lg">
+        <p
+          style={{
+            fontSize: "14px",
+            color: "#8D99AE",
+            marginBottom: "28px",
+            lineHeight: 1.7,
+          }}
+        >
           Join students who are already using StudyMind AI to prepare for their
           exams.
         </p>
         <button
           onClick={() => navigate("/register")}
-          className="bg-blue-600 text-white px-10 py-4 rounded-xl text-lg font-bold hover:bg-blue-700 transition shadow-lg"
+          style={{ ...btnPrimary, padding: "14px 36px", fontSize: "15px" }}
         >
           Get Started for Free →
         </button>
       </div>
 
       {/* Footer */}
-      <footer className="text-center py-6 text-gray-400 text-sm border-t">
-        © 2026 StudyMind AI — Built for students, by students 🎓
-      </footer>
+      <div
+        style={{
+          borderTop: "0.5px solid #1E2A3A",
+          padding: "20px",
+          textAlign: "center",
+        }}
+      >
+        <p style={{ fontSize: "12px", color: "#8D99AE" }}>
+          © 2026 StudyMind AI — Built for students, by students 🎓
+        </p>
+      </div>
     </div>
   );
 };

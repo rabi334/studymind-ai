@@ -22,6 +22,50 @@ interface StudyTask {
   duration_minutes: number;
 }
 
+//upload and parse PDF notes
+export const extractPdfText = async (filePath: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const pdfParser = new (PDFParser as any)(null, 1);
+
+    pdfParser.on("pdfParser_dataError", (err: any) => {
+      reject(err.parserError);
+    });
+
+    pdfParser.on("pdfParser_dataReady", () => {
+      const raw = pdfParser.getRawTextContent();
+      // Clean up the messy pdf2json output
+      const cleaned = raw
+        .replace(/----------------Page \(\d+\) Break----------------/g, "\n")
+        .replace(/\r\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .replace(/\s{3,}/g, " ")
+        .trim();
+      resolve(cleaned);
+    });
+
+    pdfParser.loadPDF(filePath);
+  });
+};
+
+export const extractMultiplePdfTexts = async (
+  filePaths: string[],
+): Promise<string> => {
+  const texts: string[] = [];
+
+  for (const filePath of filePaths) {
+    try {
+      const dataBuffer = fs.readFileSync(filePath);
+      const text = await extractPdfText(filePath);
+      // Give each chapter more space — 2000 chars each
+      texts.push(text.slice(0, 2000));
+    } catch (err) {
+      console.error(`Failed to parse ${filePath}:`, err);
+    }
+  }
+
+  return texts.join("\n\n=== Next Chapter ===\n\n").slice(0, 8000);
+};
+
 export const generateStudyPlan = async (
   courses: Course[],
   studentName: string,
@@ -155,48 +199,36 @@ Respond ONLY with a valid JSON array, no markdown, no explanation, just raw JSON
 export const generateTopicNotes = async (
   topic: string,
   courseName: string,
+  pdfContent?: string,
 ): Promise<string> => {
+  const contextSection = pdfContent
+    ? `\nHere is the actual course content from the student's uploaded materials:\n---\n${pdfContent.slice(0, 2000)}\n---\nUse this content to generate accurate, specific notes.`
+    : "";
+
   const prompt = `
 You are an expert university tutor.
 
-Generate clear, concise study notes for a student on this topic:
+Generate clear, detailed study notes for a student on this specific topic:
 Topic: ${topic}
 Course: ${courseName}
+${contextSection}
 
 Include:
-- Brief explanation of the topic (2-3 sentences)
-- Key concepts (3-5 bullet points)
-- A simple example if applicable
-- One tip for remembering it
+- Clear explanation of the topic based on the course content (3-4 sentences)
+- Key concepts with detailed explanations (4-6 bullet points)
+- A concrete example from the course material
+- One memory tip
 
-Format nicely but keep it concise. Use plain text, no markdown headers.
+Be specific to the actual course content, not generic. Use the uploaded material as your primary source.
 `;
 
   const response = await groq.chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [{ role: "user", content: prompt }],
-    temperature: 0.7,
+    temperature: 0.5,
   });
 
   return response.choices[0]?.message?.content || "No notes generated";
-};
-
-//upload and parse PDF notes
-export const extractPdfText = async (filePath: string): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const pdfParser = new (PDFParser as any)(null, 1);
-
-    pdfParser.on("pdfParser_dataError", (err: any) => {
-      reject(err.parserError);
-    });
-
-    pdfParser.on("pdfParser_dataReady", () => {
-      const text = pdfParser.getRawTextContent();
-      resolve(text.slice(0, 3000));
-    });
-
-    pdfParser.loadPDF(filePath);
-  });
 };
 
 export const generateStudyPlanFromPDF = async (

@@ -21,8 +21,8 @@ const Dashboard = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
-  const [error, setError] = useState("");
   const [hasPlan, setHasPlan] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchCourses();
@@ -33,7 +33,7 @@ const Dashboard = () => {
     try {
       const res = await getCourses();
       setCourses(res.data.courses);
-    } catch (err: any) {
+    } catch {
       setError("Failed to load courses");
     } finally {
       setLoading(false);
@@ -53,7 +53,7 @@ const Dashboard = () => {
     try {
       await deleteCourse(id);
       setCourses(courses.filter((c) => c.id !== id));
-    } catch (err: any) {
+    } catch {
       setError("Failed to delete course");
     }
   };
@@ -75,10 +75,24 @@ const Dashboard = () => {
     }
   };
 
-  const difficultyColor = (d: string) => {
-    if (d === "easy") return "bg-green-100 text-green-700";
-    if (d === "medium") return "bg-yellow-100 text-yellow-700";
-    return "bg-red-100 text-red-700";
+  const difficultyStyle = (d: string) => {
+    if (d === "easy")
+      return {
+        background: "#0a1f0a",
+        color: "#4ade80",
+        border: "0.5px solid #4ade80",
+      };
+    if (d === "medium")
+      return {
+        background: "#1f1a0a",
+        color: "#facc15",
+        border: "0.5px solid #facc15",
+      };
+    return {
+      background: "#1a0a1f",
+      color: "#9D4EDD",
+      border: "0.5px solid #9D4EDD",
+    };
   };
 
   const formatDate = (dateStr: string) => {
@@ -98,97 +112,194 @@ const Dashboard = () => {
     const adjusted = new Date(
       date.getTime() + date.getTimezoneOffset() * 60000,
     );
-    const diff = adjusted.getTime() - new Date().getTime();
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return Math.ceil(
+      (adjusted.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
+    );
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={{ minHeight: "100vh", background: "#121212" }}>
       {/* Navbar */}
-      <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-blue-600">StudyMind AI 🧠</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-gray-600 text-sm">Hi, {user?.name} 👋</span>
+      <nav
+        style={{
+          background: "#0B132B",
+          borderBottom: "0.5px solid #1E2A3A",
+          padding: "14px 28px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <span style={{ color: "#00F0FF", fontSize: "18px", fontWeight: 500 }}>
+          StudyMind AI
+        </span>
+        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          <span style={{ color: "#8D99AE", fontSize: "13px" }}>
+            Hi, {user?.name}
+          </span>
           <button
             onClick={() => navigate("/onboarding")}
-            className="text-sm bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg hover:bg-indigo-100 transition"
+            style={{
+              background: "#00F0FF",
+              color: "#0B132B",
+              border: "none",
+              borderRadius: "8px",
+              padding: "6px 14px",
+              fontSize: "12px",
+              fontWeight: 500,
+              cursor: "pointer",
+            }}
           >
             + Add Course
           </button>
           <button
             onClick={logout}
-            className="text-sm text-gray-500 hover:text-gray-700 transition"
+            style={{
+              background: "none",
+              border: "none",
+              color: "#8D99AE",
+              fontSize: "13px",
+              cursor: "pointer",
+            }}
           >
             Logout
           </button>
         </div>
       </nav>
 
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div
+        style={{ maxWidth: "720px", margin: "0 auto", padding: "32px 16px" }}
+      >
         {/* Header */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800">Your Courses</h2>
-          <p className="text-gray-500 mt-1">
+        <div style={{ marginBottom: "24px" }}>
+          <h2 style={{ fontSize: "20px", fontWeight: 500, color: "#FFFFFF" }}>
+            Your Courses
+          </h2>
+          <p style={{ fontSize: "13px", color: "#8D99AE", marginTop: "4px" }}>
             Manage your courses and generate your AI study plan
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-600 rounded-lg p-3 mb-6 text-sm">
+          <div
+            style={{
+              background: "#1a0a0a",
+              border: "0.5px solid #A32D2D",
+              borderRadius: "8px",
+              padding: "10px 14px",
+              marginBottom: "16px",
+              fontSize: "13px",
+              color: "#F09595",
+            }}
+          >
             {error}
           </div>
         )}
 
-        {/* Courses list */}
+        {/* Courses */}
         {loading ? (
-          <div className="text-center py-12 text-gray-400">
+          <p
+            style={{ color: "#8D99AE", textAlign: "center", padding: "40px 0" }}
+          >
             Loading courses...
-          </div>
+          </p>
         ) : courses.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-400 text-lg mb-4">No courses yet</p>
+          <div style={{ textAlign: "center", padding: "48px 0" }}>
+            <p style={{ color: "#8D99AE", marginBottom: "16px" }}>
+              No courses yet
+            </p>
             <button
               onClick={() => navigate("/onboarding")}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+              style={{
+                background: "#00F0FF",
+                color: "#0B132B",
+                border: "none",
+                borderRadius: "8px",
+                padding: "10px 24px",
+                fontSize: "14px",
+                fontWeight: 500,
+                cursor: "pointer",
+              }}
             >
               Add your first course
             </button>
           </div>
         ) : (
-          <div className="space-y-3 mb-8">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+              marginBottom: "24px",
+            }}
+          >
             {courses.map((course) => {
               const days = daysUntil(course.exam_date);
               return (
                 <div
                   key={course.id}
-                  className="bg-white rounded-xl shadow-sm border border-gray-100 px-6 py-4 flex items-center justify-between"
+                  style={{
+                    background: "#0B132B",
+                    border: "0.5px solid #1E2A3A",
+                    borderRadius: "12px",
+                    padding: "16px 20px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
                 >
                   <div>
-                    <h3 className="font-semibold text-gray-800">
+                    <p
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: 500,
+                        color: "#FFFFFF",
+                      }}
+                    >
                       {course.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Exam: {formatDate(course.exam_date)} •{" "}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "12px",
+                        color: "#8D99AE",
+                        marginTop: "3px",
+                      }}
+                    >
+                      Exam: {formatDate(course.exam_date)} ·{" "}
                       <span
-                        className={
-                          days <= 3
-                            ? "text-red-500 font-medium"
-                            : "text-gray-400"
-                        }
+                        style={{ color: days <= 3 ? "#F09595" : "#00F0FF" }}
                       >
                         {days > 0 ? `${days} days left` : "Exam passed"}
                       </span>
                     </p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "8px",
+                      alignItems: "center",
+                    }}
+                  >
                     <span
-                      className={`text-xs px-2 py-1 rounded-full font-medium ${difficultyColor(course.difficulty)}`}
+                      style={{
+                        fontSize: "11px",
+                        padding: "3px 10px",
+                        borderRadius: "6px",
+                        ...difficultyStyle(course.difficulty),
+                      }}
                     >
                       {course.difficulty}
                     </span>
                     <button
                       onClick={() => handleDeleteCourse(course.id)}
-                      className="text-red-400 hover:text-red-600 text-lg font-bold"
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#8D99AE",
+                        fontSize: "20px",
+                        cursor: "pointer",
+                        lineHeight: 1,
+                      }}
                     >
                       ×
                     </button>
@@ -199,48 +310,90 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Generate Plan Button */}
+        {/* Generate Plan */}
         {courses.length > 0 && (
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white text-center">
-            <h3 className="text-xl font-bold mb-2">
+          <div
+            style={{
+              background: "#0B132B",
+              border: "0.5px solid #1E2A3A",
+              borderRadius: "16px",
+              padding: "28px",
+              textAlign: "center",
+            }}
+          >
+            <h3
+              style={{
+                fontSize: "16px",
+                fontWeight: 500,
+                color: "#FFFFFF",
+                marginBottom: "6px",
+              }}
+            >
               {hasPlan
-                ? "Your study plan is ready! 📖"
+                ? "Your study plan is ready"
                 : "Ready to build your study plan?"}
             </h3>
-            <p className="text-blue-100 mb-4 text-sm">
+            <p
+              style={{
+                fontSize: "13px",
+                color: "#8D99AE",
+                marginBottom: "20px",
+              }}
+            >
               {hasPlan
-                ? "Continue where you left off or generate a new one"
+                ? "Continue where you left off or generate a fresh one"
                 : `AI will create a personalized plan based on your ${courses.length} course${courses.length !== 1 ? "s" : ""}`}
             </p>
-            <div className="flex gap-3 justify-center">
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                justifyContent: "center",
+                flexWrap: "wrap",
+              }}
+            >
               {hasPlan && (
                 <button
                   onClick={() => navigate("/study-plan")}
-                  className="bg-white text-blue-600 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition"
+                  style={{
+                    background: "#00F0FF",
+                    color: "#0B132B",
+                    border: "none",
+                    borderRadius: "8px",
+                    padding: "10px 24px",
+                    fontSize: "14px",
+                    fontWeight: 500,
+                    cursor: "pointer",
+                  }}
                 >
-                  📖 View My Plan
+                  View My Plan
                 </button>
               )}
               <button
                 onClick={handleGeneratePlan}
                 disabled={generating}
-                className={`font-bold px-8 py-3 rounded-xl transition disabled:opacity-50 ${
-                  hasPlan
-                    ? "bg-blue-500 text-white hover:bg-blue-400"
-                    : "bg-white text-blue-600 hover:bg-blue-50"
-                }`}
+                style={{
+                  background: hasPlan ? "#1E2A3A" : "#00F0FF",
+                  color: hasPlan ? "#8D99AE" : "#0B132B",
+                  border: hasPlan ? "0.5px solid #1E2A3A" : "none",
+                  borderRadius: "8px",
+                  padding: "10px 24px",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  cursor: generating ? "not-allowed" : "pointer",
+                  opacity: generating ? 0.7 : 1,
+                }}
               >
                 {generating
-                  ? "⏳ Generating..."
+                  ? "Generating..."
                   : hasPlan
-                    ? "🔄 Regenerate Plan"
-                    : "✨ Generate My Study Plan"}
+                    ? "Regenerate Plan"
+                    : "Generate My Study Plan"}
               </button>
             </div>
           </div>
         )}
       </div>
-      
     </div>
   );
 };

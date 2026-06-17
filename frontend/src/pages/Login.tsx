@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { loginUser } from '../services/api';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { loginUser } from "../services/api";
 
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -17,47 +17,109 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
     try {
       const res = await loginUser(form);
       login(res.data.user, res.data.token);
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed');
+      setError(err.response?.data?.error || "Login failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">StudyMind AI 🧠</h1>
-          <p className="text-gray-500 mt-2">Welcome back</p>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#121212",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "1rem",
+      }}
+    >
+      <div
+        style={{
+          background: "#121212",
+          border: "0.5px solid #1E2A3A",
+          borderRadius: "16px",
+          padding: "36px",
+          width: "100%",
+          maxWidth: "400px",
+        }}
+      >
+        <div style={{ textAlign: "center", marginBottom: "28px" }}>
+          <h1 style={{ fontSize: "22px", fontWeight: 500, color: "#00F0FF" }}>
+            StudyMind AI
+          </h1>
+          <p style={{ fontSize: "13px", color: "#8D99AE", marginTop: "6px" }}>
+            Welcome back
+          </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-600 rounded-lg p-3 mb-4 text-sm">
+          <div
+            style={{
+              background: "#1a0a0a",
+              border: "0.5px solid #A32D2D",
+              borderRadius: "8px",
+              padding: "10px 14px",
+              marginBottom: "16px",
+              fontSize: "13px",
+              color: "#F09595",
+            }}
+          >
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+        >
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label
+              style={{
+                fontSize: "12px",
+                color: "#8D99AE",
+                display: "block",
+                marginBottom: "6px",
+              }}
+            >
+              Email
+            </label>
             <input
               name="email"
               type="email"
-              placeholder="bos@example.com"
+              placeholder="you@example.com"
               value={form.email}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                width: "100%",
+                background: "#0B132B",
+                border: "0.5px solid #1E2A3A",
+                borderRadius: "8px",
+                padding: "10px 14px",
+                fontSize: "14px",
+                color: "#FFFFFF",
+                outline: "none",
+              }}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label
+              style={{
+                fontSize: "12px",
+                color: "#8D99AE",
+                display: "block",
+                marginBottom: "6px",
+              }}
+            >
+              Password
+            </label>
             <input
               name="password"
               type="password"
@@ -65,21 +127,51 @@ const Login = () => {
               value={form.password}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                width: "100%",
+                background: "#0B132B",
+                border: "0.5px solid #1E2A3A",
+                borderRadius: "8px",
+                padding: "10px 14px",
+                fontSize: "14px",
+                color: "#FFFFFF",
+                outline: "none",
+              }}
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition disabled:opacity-50"
+            style={{
+              background: "#00F0FF",
+              color: "#0B132B",
+              border: "none",
+              borderRadius: "8px",
+              padding: "12px",
+              fontSize: "14px",
+              fontWeight: 500,
+              cursor: loading ? "not-allowed" : "pointer",
+              opacity: loading ? 0.7 : 1,
+              marginTop: "8px",
+            }}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-blue-600 font-medium hover:underline">
+        <p
+          style={{
+            textAlign: "center",
+            fontSize: "13px",
+            color: "#8D99AE",
+            marginTop: "20px",
+          }}
+        >
+          Don't have an account?{" "}
+          <Link
+            to="/register"
+            style={{ color: "#00F0FF", textDecoration: "none" }}
+          >
             Register
           </Link>
         </p>

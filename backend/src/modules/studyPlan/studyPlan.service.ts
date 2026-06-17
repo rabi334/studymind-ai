@@ -209,9 +209,8 @@ export const getTaskNotes = async (
   taskId: number,
   userId: number,
 ): Promise<string> => {
-  // Verify task belongs to user
   const verify = await pool.query(
-    `SELECT st.*, c.name as course_name 
+    `SELECT st.*, c.name as course_name, c.pdf_content
      FROM study_tasks st
      JOIN study_plans sp ON st.plan_id = sp.id
      LEFT JOIN courses c ON st.course_id = c.id
@@ -230,8 +229,12 @@ export const getTaskNotes = async (
     return task.ai_notes;
   }
 
-  // Generate new notes
-  const notes = await generateTopicNotes(task.topic, task.course_name);
+  // Generate notes with PDF context
+  const notes = await generateTopicNotes(
+    task.topic,
+    task.course_name,
+    task.pdf_content || undefined,
+  );
 
   // Cache in database
   await pool.query("UPDATE study_tasks SET ai_notes = $1 WHERE id = $2", [
