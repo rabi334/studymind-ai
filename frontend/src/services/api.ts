@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://studymindaibackend-pea749hb.b4a.run/api",
+  baseURL: import.meta.env.VITE_API_URL || "https://studymindaibackend-pea749hb.b4a.run/api",
 });
 
 // Automatically attach token to every request
